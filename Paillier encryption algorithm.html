@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Key Recovery with Secret Sharing </h2>
+
+Secret: 
+<input id="s" name="s" size="130" value="13103707826902088814996031998741783683272131504357744958080747192498471855483101418581661104124259179108503796378114963211288661662658022889294052704130987"><br/>
+
+Student ID: 
+<input id="ID" name="ID" size="130" value="7333363630343334 "><br/>
+
+Random Number: 
+<input id="RN" name="RN" size="130" value="8923456712345678 "><br/>
+<br/>
+
+The Polynomial Answer:
+<br/>
+<button type="button" onclick="polynomialequation()">get polynomial equation</button>
+<br/>
+<div id="The polynomial Answer" name="The polynomial Answer"></div>
+<br/>
+<button type="button" onclick="compute()">Compute</button>
+<br/>
+<div id="1" name="1"></div>
+<div id="2" name="2"></div>
+<div id="3" name="3"></div>
+<div id="4" name="4"></div>
+<br/>
+<br/>
+Select two points above and then you can recover the secret: 
+<br/>
+The X1: <input id="X1" name="X1"/><br/>
+The Y1: <input id="Y1" name="Y1"/><br/>
+<br/>
+The X2: <input id="X2" name="X2"/><br/>
+The Y2: <input id="Y2" name="Y2"/><br/>
+<br/>
+<button type="button" onclick="Getting_back_the_secret()">Get The Secret Back</button>
+<br/>
+<div id="Getting the secret back" name="Getting the secret back"></div>
+
+<script src="biginteger.js"></script>
+
+<script type="text/javascript">
+
+    function polynomialequation()
+    {
+        var s=document.getElementById("s").value;
+        var b=document.getElementById("ID").value;
+        var p=document.getElementById("RN").value;
+        document.getElementById('The polynomial Answer').innerHTML = s + " + " + b + "x mod " + p;
+    }
+
+    function compute()
+    {
+        
+        var Ss=document.getElementById("s").value;
+        Ss = bigInt(Ss);
+        var id=document.getElementById("ID").value;
+        id = bigInt(id);
+        var rn=document.getElementById("RN").value;
+        rn = bigInt(rn);
+
+        var x1 = bigInt("1");
+        var y1 = adder_mod(Ss, m_mod(id, x1, rn), rn);
+        var x2 = bigInt("2");
+        var y2 = adder_mod(Ss, m_mod(id, x2, rn), rn);
+        var x3 = bigInt("3");
+        var y3 = adder_mod(Ss, m_mod(id, x3, rn), rn);
+        var x4 = bigInt("4");
+        var y4 = adder_mod(Ss, m_mod(id, x4, rn), rn);
+
+        document.getElementById('1').innerHTML = "(" + x1.toString() + ", " + y1.toString() + ")";
+        document.getElementById('2').innerHTML = "(" + x2.toString() + ", " + y2.toString() + ")";
+        document.getElementById('3').innerHTML = "(" + x3.toString() + ", " + y3.toString() + ")";
+        document.getElementById('4').innerHTML = "(" + x4.toString() + ", " + y4.toString() + ")";
+    
+    }
+
+
+    function Getting_back_the_secret()
+    {
+        var ID=document.getElementById("RN").value;
+        ID = bigInt(ID);
+
+        var x1=document.getElementById("X1").value;
+        x1 = bigInt(x1);
+        var y1=document.getElementById("Y1").value;
+        y1 = bigInt(y1);
+
+        var x2=document.getElementById("X2").value;
+        x2 = bigInt(x2);
+        var y2=document.getElementById("Y2").value;
+        y2 = bigInt(y2);
+    
+        var first_secret = m_mod(y1, m_mod(x2, i_mod(subract_mod(x2, x1, rn), rn), rn), rn);
+
+        var second_secret = m_mod(y2, m_mod(x1, i_mod(subract_mod(x1, x2, rn), rn), rn), rn);
+
+        var getting_the_secret = adder_mod(first_secret, second_secret, rn);
+
+        document.getElementById('Getting the secret back').innerHTML = getting_the_secret.toString();
+
+    }
+
+    function mod(a, b) 
+    {
+        var result = a.mod(b);
+        if (result.isNegative())
+            result = result.add(b);
+        return result;
+    }
+
+    function p_mod(a, b, c)
+    {
+        var result = a.modPow(b, c);
+        return result;
+    }
+
+    function adder_mod(a, b, c)
+    {
+        var result = a.add(b);
+        result = mod(result, c);
+        return result;
+    }
+    
+    function subtract_mod(a, b, c)
+    {
+        var result = a.subtract(b);
+        result = mod(result, c);
+        return result;
+    }
+    
+    function m_mod(a, b, c)
+    {
+        var result = a.multiply(b);
+        result = mod(result, c);
+        return result;
+    }
+    
+    function i_mod(a, b) 
+    {
+        var result = a.mod(b);
+        result = result.modInv(b);
+        return result;
+    }
+</script>
+
+</body>
+</html>
